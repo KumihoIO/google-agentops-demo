@@ -1,0 +1,49 @@
+name: Revka Issue Trigger
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number to send to Revka"
+        required: true
+
+jobs:
+  trigger-revka:
+    if: github.event_name == 'workflow_dispatch' || (github.event.action == 'labeled' && github.event.label.name == 'revka-demo')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+        run: gh api "repos/${GITHUB_REPOSITORY}/issues/${ISSUE_NUMBER}" > issue.json
+
+      - name: Trigger Revka workflow
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+          REVKA_BEARER_TOKEN: ${{ secrets.REVKA_BEARER_TOKEN }}
+          REVKA_GATEWAY_URL: ${{ secrets.REVKA_GATEWAY_URL }}
+          REVKA_WORKFLOW_NAME: ${{ vars.REVKA_WORKFLOW_NAME }}
+        run: |
+          : "${REVKA_BEARER_TOKEN:?Set the REVKA_BEARER_TOKEN repository secret}"
+          : "${REVKA_GATEWAY_URL:?Set the REVKA_GATEWAY_URL repository secret}"
+
+          workflow_name="${REVKA_WORKFLOW_NAME:-github-issue-resolver}"
+          gateway="${REVKA_GATEWAY_URL%/}"
+
+          python scripts/build_revka_payload.py issue.json > payload.json
+
+          curl --fail --show-error --silent \
+            -X POST "${gateway}/api/workflows/run/${workflow_name}" \
+            -H "Authorization: Bearer ${REVKA_BEARER_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data @payload.json
+
