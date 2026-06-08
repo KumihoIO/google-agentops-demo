@@ -48,4 +48,15 @@ POST $REVKA_GATEWAY_URL/api/workflows/run/$REVKA_WORKFLOW_NAME
 Authorization: Bearer $REVKA_BEARER_TOKEN
 ```
 
-Revka should inspect the issue, reproduce the quantity bug, add a regression test, fix `subtotal_cents`, and open a PR.
+The request body uses the built-in `github-issue-resolver` inputs:
+
+```json
+{
+  "inputs": {
+    "github_payload": "{...issue json...}",
+    "repo_name": "KumihoIO/google-agentops-demo"
+  }
+}
+```
+
+Revka should inspect the issue, ask for human approval, reproduce the quantity bug, add a regression test, fix `subtotal_cents`, open a PR, then pause again before merge/close.
