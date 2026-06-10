@@ -34,3 +34,12 @@ def test_format_money_rejects_negative_values() -> None:
     else:
         raise AssertionError("expected ValueError")
 
+
+def test_subtotal_respects_quantity() -> None:
+    items = [
+        LineItem(sku="notebook", unit_price_cents=1250, quantity=3),
+        LineItem(sku="sticker-pack", unit_price_cents=250),
+    ]
+    # 1250*3 + 250*1 = 4000
+    assert subtotal_cents(items) == 4000
+

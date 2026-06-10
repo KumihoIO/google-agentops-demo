@@ -22,13 +22,9 @@ class LineItem:
 
 
 def subtotal_cents(items: Iterable[LineItem]) -> int:
-    """Return the cart subtotal in cents.
+    """Return the cart subtotal in cents."""
 
-    BUG: this currently ignores ``quantity``. The demo issue asks Revka to
-    add the missing regression test and fix the calculation.
-    """
-
-    return sum(item.unit_price_cents for item in items)
+    return sum(item.unit_price_cents * item.quantity for item in items)
 
 
 def format_money(cents: int) -> str:
