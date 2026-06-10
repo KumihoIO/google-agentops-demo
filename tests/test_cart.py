@@ -1,4 +1,10 @@
-from agentops_demo import LineItem, format_money, receipt_summary, subtotal_cents
+from agentops_demo import (
+    LineItem,
+    format_money,
+    receipt_summary,
+    subtotal_cents,
+    total_with_tax_cents,
+)
 
 
 def test_subtotal_for_single_quantity_items() -> None:
@@ -43,3 +49,12 @@ def test_subtotal_respects_quantity() -> None:
     # 1250*3 + 250*1 = 4000
     assert subtotal_cents(items) == 4000
 
+
+def test_total_with_tax() -> None:
+    items = [
+        LineItem(sku="shirt", unit_price_cents=2000, quantity=4),  # 8000
+        LineItem(sku="pants", unit_price_cents=2000, quantity=1),  # 2000
+    ]
+    # subtotal is 10000 cents ($100.00)
+    # tax at 8.75% is 875 cents ($8.75)
+    assert total_with_tax_cents(items, tax_rate_bps=875) == 10875
