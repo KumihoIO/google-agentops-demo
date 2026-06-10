@@ -27,6 +27,21 @@ def subtotal_cents(items: Iterable[LineItem]) -> int:
     return sum(item.unit_price_cents * item.quantity for item in items)
 
 
+def total_with_tax_cents(items: Iterable[LineItem], tax_rate_bps: int) -> int:
+    """Return the cart total in cents, including sales tax.
+
+    Args:
+        items: The line items in the cart.
+        tax_rate_bps: The sales tax rate in basis points (1/100 of 1%).
+    """
+    if tax_rate_bps < 0:
+        raise ValueError("tax_rate_bps must be non-negative")
+
+    subtotal = subtotal_cents(items)
+    tax_cents = subtotal * tax_rate_bps / 10000
+    return subtotal + round(tax_cents)
+
+
 def format_money(cents: int) -> str:
     """Format cents as a US dollar amount."""
 
