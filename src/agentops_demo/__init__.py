@@ -10,6 +10,7 @@ from .cart import (
     round_subtotal_to_dollars,
     subtotal_cents,
     total_with_tax_cents,
+    split_evenly,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "round_subtotal_to_dollars",
     "subtotal_cents",
     "total_with_tax_cents",
+    "split_evenly",
 ]

@@ -113,3 +113,26 @@ def receipt_summary(items: Iterable[LineItem]) -> dict[str, int | str]:
         "subtotal_cents": subtotal,
         "subtotal": format_money(subtotal),
     }
+
+def split_evenly(items: Iterable[LineItem], n_ways: int) -> list[int]:
+    """Splits the cart subtotal across N people.
+
+    Args:
+        items: The line items in the cart.
+        n_ways: The number of ways to split the subtotal.
+
+    Returns:
+        A list of per-person amounts in integer cents that sum exactly to the
+        subtotal.
+    """
+    if n_ways < 1:
+        raise ValueError("n_ways must be at least 1")
+
+    total = subtotal_cents(items)
+    base_amount, remainder = divmod(total, n_ways)
+    
+    amounts = [base_amount] * n_ways
+    for i in range(remainder):
+        amounts[i] += 1
+    
+    return amounts
