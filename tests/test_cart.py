@@ -5,6 +5,7 @@ from agentops_demo import (
     subtotal_cents,
     total_with_tax_cents,
     apply_percentage_discount,
+    round_subtotal_to_dollars,
 )
 
 
@@ -77,3 +78,36 @@ def test_apply_percentage_discount() -> None:
     # Subtotal is 999. 10% off is 99.9
     # 999 - 99.9 = 899.1 which rounds to 899
     assert apply_percentage_discount(items_for_rounding, 10) == 899
+
+
+def test_round_subtotal_to_dollars() -> None:
+    """Tests rounding of subtotal to the nearest dollar."""
+    # $12.49 rounds down to $12.00
+    items_round_down = [LineItem(sku="item", unit_price_cents=1249)]
+    assert round_subtotal_to_dollars(items_round_down) == 1200
+
+    # $12.50 rounds to nearest even ($12.00)
+    items_round_half_even = [LineItem(sku="item", unit_price_cents=1250)]
+    assert round_subtotal_to_dollars(items_round_half_even) == 1200
+
+    # $13.50 rounds to nearest even ($14.00)
+    items_round_half_odd = [LineItem(sku="item", unit_price_cents=1350)]
+    assert round_subtotal_to_dollars(items_round_half_odd) == 1400
+
+    # $12.51 rounds up to $13.00
+    items_round_up = [LineItem(sku="item", unit_price_cents=1251)]
+    assert round_subtotal_to_dollars(items_round_up) == 1300
+
+    # Test with multiple items, subtotal $12.50, rounds to $12.00
+    items_multiple = [
+        LineItem(sku="a", unit_price_cents=1020),  # $10.20
+        LineItem(sku="b", unit_price_cents=230),  # $2.30
+    ]
+    assert round_subtotal_to_dollars(items_multiple) == 1200
+
+    # Test with multiple items, subtotal $13.50, rounds to $14.00
+    items_multiple_2 = [
+        LineItem(sku="a", unit_price_cents=1020),  # $10.20
+        LineItem(sku="b", unit_price_cents=330),  # $3.30
+    ]
+    assert round_subtotal_to_dollars(items_multiple_2) == 1400

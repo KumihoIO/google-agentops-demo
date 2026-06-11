@@ -27,6 +27,13 @@ def subtotal_cents(items: Iterable[LineItem]) -> int:
     return sum(item.unit_price_cents * item.quantity for item in items)
 
 
+def round_subtotal_to_dollars(items: Iterable[LineItem]) -> int:
+    """Return the cart subtotal rounded to the nearest dollar, in cents."""
+
+    subtotal = subtotal_cents(items)
+    return int(round(subtotal / 100.0) * 100)
+
+
 def total_with_tax_cents(items: Iterable[LineItem], tax_rate_bps: int) -> int:
     """Return the cart total in cents, including sales tax.
 
