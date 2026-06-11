@@ -4,6 +4,7 @@ from agentops_demo import (
     receipt_summary,
     subtotal_cents,
     total_with_tax_cents,
+    apply_percentage_discount,
 )
 
 
@@ -58,3 +59,21 @@ def test_total_with_tax() -> None:
     # subtotal is 10000 cents ($100.00)
     # tax at 8.75% is 875 cents ($8.75)
     assert total_with_tax_cents(items, tax_rate_bps=875) == 10875
+
+
+def test_apply_percentage_discount() -> None:
+    items = [
+        LineItem(sku="notebook", unit_price_cents=1000),
+        LineItem(sku="pen", unit_price_cents=200),
+    ]
+    # Subtotal is 1200 cents. 10% off is 120 cents.
+    # 1200 - 120 = 1080
+    assert apply_percentage_discount(items, 10) == 1080
+
+    # Test with rounding
+    items_for_rounding = [
+        LineItem(sku="notebook", unit_price_cents=999),
+    ]
+    # Subtotal is 999. 10% off is 99.9
+    # 999 - 99.9 = 899.1 which rounds to 899
+    assert apply_percentage_discount(items_for_rounding, 10) == 899

@@ -6,6 +6,7 @@ from .cart import (
     receipt_summary,
     subtotal_cents,
     total_with_tax_cents,
+    apply_percentage_discount,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "receipt_summary",
     "subtotal_cents",
     "total_with_tax_cents",
+    "apply_percentage_discount",
 ]
