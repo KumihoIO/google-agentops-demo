@@ -49,19 +49,22 @@ def total_with_tax_cents(items: Iterable[LineItem], tax_rate_bps: int) -> int:
     return subtotal + round(tax_cents)
 
 
-def apply_percentage_discount(items: Iterable[LineItem], percent_off: float) -> int:
-    """Return the cart subtotal in cents with a percentage discount applied.
+def apply_percentage_discount(items: Iterable[LineItem], percent_off: int) -> int:
+    """Return the cart subtotal after a percentage discount.
+
+    Rounds to the nearest cent using Python's built-in ``round()``
+    (rounds half to even).
 
     Args:
         items: The line items in the cart.
-        percent_off: The discount percentage (e.g., 10 for 10% off).
+        percent_off: The discount as an integer percentage (0-100).
     """
     if not 0 <= percent_off <= 100:
         raise ValueError("percent_off must be between 0 and 100")
 
     subtotal = subtotal_cents(items)
-    discount_amount = subtotal * (percent_off / 100)
-    return round(subtotal - discount_amount)
+    discounted_subtotal = subtotal * (100 - percent_off) / 100
+    return round(discounted_subtotal)
 
 
 def format_money(cents: int) -> str:
