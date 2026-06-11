@@ -6,6 +6,7 @@ from agentops_demo import (
     total_with_tax_cents,
     apply_percentage_discount,
     round_subtotal_to_dollars,
+    apply_flat_discount,
 )
 
 
@@ -78,6 +79,19 @@ def test_apply_percentage_discount() -> None:
     # Subtotal is 999. 10% off is 99.9
     # 999 - 99.9 = 899.1 which rounds to 899
     assert apply_percentage_discount(items_for_rounding, 10) == 899
+
+
+def test_apply_flat_discount() -> None:
+    """Tests apply_flat_discount with and without clamping."""
+    items = [
+        LineItem(sku="notebook", unit_price_cents=1000),
+        LineItem(sku="pen", unit_price_cents=200),
+    ]
+    # Subtotal is 1200. $5 discount.
+    assert apply_flat_discount(items, 500) == 700
+
+    # Discount exceeds subtotal, should clamp to 0.
+    assert apply_flat_discount(items, 1500) == 0
 
 
 def test_round_subtotal_to_dollars() -> None:
