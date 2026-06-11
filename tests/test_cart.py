@@ -8,6 +8,7 @@ from agentops_demo import (
     round_subtotal_to_dollars,
     apply_flat_discount,
     apply_tax,
+    split_evenly,
 )
 
 
@@ -148,3 +149,25 @@ def test_apply_tax() -> None:
         assert "non-negative" in str(exc)
     else:
         raise AssertionError("expected ValueError for negative tax_bps")
+
+
+def test_split_evenly() -> None:
+    """Tests split_evenly with and without remainders."""
+    # 1000 cents split 3 ways -> [334, 333, 333]
+    items = [LineItem(sku="widget", unit_price_cents=1000)]
+    assert split_evenly(items, 3) == [334, 333, 333]
+
+    # Test with no remainder.
+    items_no_remainder = [LineItem(sku="widget", unit_price_cents=1000)]
+    assert split_evenly(items_no_remainder, 2) == [500, 500]
+
+    # Test with empty items.
+    assert split_evenly([], 5) == [0, 0, 0, 0, 0]
+
+    # Test input validation.
+    try:
+        split_evenly(items, 0)
+    except ValueError as exc:
+        assert "at least 1" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for n_ways < 1")
