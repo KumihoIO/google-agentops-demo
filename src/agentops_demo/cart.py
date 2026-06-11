@@ -64,6 +64,17 @@ def apply_percentage_discount(items: Iterable[LineItem], percent_off: float) -> 
     return round(subtotal - discount_amount)
 
 
+def apply_flat_discount(items: Iterable[LineItem], discount_cents: int) -> int:
+    """Return the cart subtotal minus a flat discount, in cents.
+
+    Args:
+        items: The line items in the cart.
+        discount_cents: The discount amount in cents.
+    """
+    subtotal = subtotal_cents(items)
+    return max(0, subtotal - discount_cents)
+
+
 def format_money(cents: int) -> str:
     """Format cents as a US dollar amount."""
 

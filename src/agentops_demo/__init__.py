@@ -7,6 +7,8 @@ from .cart import (
     subtotal_cents,
     total_with_tax_cents,
     apply_percentage_discount,
+    apply_flat_discount,
+    round_subtotal_to_dollars,
 )
 
 __all__ = [
@@ -16,4 +18,6 @@ __all__ = [
     "subtotal_cents",
     "total_with_tax_cents",
     "apply_percentage_discount",
+    "apply_flat_discount",
+    "round_subtotal_to_dollars",
 ]
