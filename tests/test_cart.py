@@ -7,6 +7,7 @@ from agentops_demo import (
     apply_percentage_discount,
     round_subtotal_to_dollars,
     apply_flat_discount,
+    apply_tax,
 )
 
 
@@ -125,3 +126,25 @@ def test_round_subtotal_to_dollars() -> None:
         LineItem(sku="b", unit_price_cents=330),  # $3.30
     ]
     assert round_subtotal_to_dollars(items_multiple_2) == 1400
+
+
+def test_apply_tax() -> None:
+    """Tests apply_tax with a value that requires rounding up."""
+    # 8.75% tax on 1000c -> 1088c
+    # Subtotal is 1000 cents.
+    # Tax is 1000 * 0.0875 = 87.5 cents.
+    # Total is 1087.5, which should round up to 1088.
+    items = [LineItem(sku="widget", unit_price_cents=1000)]
+    assert apply_tax(items, tax_bps=875) == 1088
+
+    # Test with a value that doesn't require rounding.
+    # 10% tax on 1000c -> 1100c
+    assert apply_tax(items, tax_bps=1000) == 1100
+
+    # Test input validation.
+    try:
+        apply_tax(items, tax_bps=-1)
+    except ValueError as exc:
+        assert "non-negative" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for negative tax_bps")
