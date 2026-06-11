@@ -9,6 +9,7 @@ from agentops_demo import (
     apply_flat_discount,
     apply_tax,
     split_evenly,
+    round_up_to_nearest,
 )
 
 
@@ -171,3 +172,30 @@ def test_split_evenly() -> None:
         assert "at least 1" in str(exc)
     else:
         raise AssertionError("expected ValueError for n_ways < 1")
+
+
+def test_round_up_to_nearest() -> None:
+    """Tests round_up_to_nearest with various subtotals and steps."""
+    # Subtotal 1023c, step 25c -> 1025c
+    items = [LineItem(sku="widget", unit_price_cents=1023)]
+    assert round_up_to_nearest(items, 25) == 1025
+
+    # Already a multiple, should stay the same.
+    items_exact = [LineItem(sku="widget", unit_price_cents=1025)]
+    assert round_up_to_nearest(items_exact, 25) == 1025
+
+    # Subtotal 1000c, step 100c -> 1000c
+    items_1000 = [LineItem(sku="widget", unit_price_cents=1000)]
+    assert round_up_to_nearest(items_1000, 100) == 1000
+
+    # Subtotal 1001c, step 100c -> 1100c
+    items_1001 = [LineItem(sku="widget", unit_price_cents=1001)]
+    assert round_up_to_nearest(items_1001, 100) == 1100
+
+    # Test input validation for step_cents.
+    try:
+        round_up_to_nearest(items, 0)
+    except ValueError as exc:
+        assert "at least 1" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for step_cents < 1")

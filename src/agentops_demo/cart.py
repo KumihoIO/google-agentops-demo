@@ -30,6 +30,27 @@ def subtotal_cents(items: Iterable[LineItem]) -> int:
     return sum(item.unit_price_cents * item.quantity for item in items)
 
 
+def round_up_to_nearest(items: Iterable[LineItem], step_cents: int) -> int:
+    """Rounds the cart subtotal up to the nearest multiple of step_cents.
+
+    Args:
+        items: The line items in the cart.
+        step_cents: The multiple to round up to, in cents.
+
+    Returns:
+        The subtotal rounded up to the nearest multiple of step_cents.
+    """
+    if step_cents < 1:
+        raise ValueError("step_cents must be at least 1")
+
+    subtotal = subtotal_cents(items)
+    if subtotal % step_cents == 0:
+        return subtotal
+    
+    remainder = subtotal % step_cents
+    return subtotal + (step_cents - remainder)
+
+
 def round_subtotal_to_dollars(items: Iterable[LineItem]) -> int:
     """Return the cart subtotal rounded to the nearest dollar, in cents."""
 
@@ -113,6 +134,7 @@ def receipt_summary(items: Iterable[LineItem]) -> dict[str, int | str]:
         "subtotal_cents": subtotal,
         "subtotal": format_money(subtotal),
     }
+
 
 def split_evenly(items: Iterable[LineItem], n_ways: int) -> list[int]:
     """Splits the cart subtotal across N people.
