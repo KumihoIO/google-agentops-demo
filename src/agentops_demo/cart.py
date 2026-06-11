@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Iterable
 
 
 @dataclass(frozen=True)
 class LineItem:
+    """A line item in a shopping cart."""
+
     sku: str
     unit_price_cents: int
     quantity: int = 1
@@ -47,6 +50,22 @@ def total_with_tax_cents(items: Iterable[LineItem], tax_rate_bps: int) -> int:
     subtotal = subtotal_cents(items)
     tax_cents = subtotal * tax_rate_bps / 10000
     return subtotal + round(tax_cents)
+
+
+def apply_tax(items: Iterable[LineItem], tax_bps: int) -> int:
+    """Return subtotal + tax in integer cents, rounded half-up.
+
+    Args:
+        items: The line items in the cart.
+        tax_bps: The sales tax rate in basis points (1/100 of 1%).
+    """
+    if tax_bps < 0:
+        raise ValueError("tax_bps must be non-negative")
+
+    subtotal = subtotal_cents(items)
+    tax = Decimal(subtotal) * (Decimal(tax_bps) / Decimal(10000))
+    total = Decimal(subtotal) + tax
+    return int(total.to_integral_value(rounding=ROUND_HALF_UP))
 
 
 def apply_percentage_discount(items: Iterable[LineItem], percent_off: float) -> int:
