@@ -42,6 +42,21 @@ def total_with_tax_cents(items: Iterable[LineItem], tax_rate_bps: int) -> int:
     return subtotal + round(tax_cents)
 
 
+def apply_percentage_discount(items: Iterable[LineItem], percent_off: float) -> int:
+    """Return the cart subtotal in cents with a percentage discount applied.
+
+    Args:
+        items: The line items in the cart.
+        percent_off: The discount percentage (e.g., 10 for 10% off).
+    """
+    if not 0 <= percent_off <= 100:
+        raise ValueError("percent_off must be between 0 and 100")
+
+    subtotal = subtotal_cents(items)
+    discount_amount = subtotal * (percent_off / 100)
+    return round(subtotal - discount_amount)
+
+
 def format_money(cents: int) -> str:
     """Format cents as a US dollar amount."""
 
@@ -61,4 +76,3 @@ def receipt_summary(items: Iterable[LineItem]) -> dict[str, int | str]:
         "subtotal_cents": subtotal,
         "subtotal": format_money(subtotal),
     }
-
