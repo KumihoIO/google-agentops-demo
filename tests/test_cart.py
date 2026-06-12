@@ -10,6 +10,7 @@ from agentops_demo import (
     apply_tax,
     split_evenly,
     round_up_to_nearest,
+    apply_shipping,
 )
 
 
@@ -199,3 +200,33 @@ def test_round_up_to_nearest() -> None:
         assert "at least 1" in str(exc)
     else:
         raise AssertionError("expected ValueError for step_cents < 1")
+
+def test_apply_shipping() -> None:
+    """Tests apply_shipping with and without free shipping."""
+    items = [LineItem(sku="widget", unit_price_cents=900)]
+    # Subtotal 900c, fee 499c, threshold 1000c -> 1399c
+    assert apply_shipping(items, 499, 1000) == 1399
+
+    # Subtotal 1000c, fee 499c, threshold 1000c -> 1000c (free)
+    items_at_threshold = [LineItem(sku="widget", unit_price_cents=1000)]
+    assert apply_shipping(items_at_threshold, 499, 1000) == 1000
+
+    # Subtotal 1100c, fee 499c, threshold 1000c -> 1100c (free)
+    items_over_threshold = [LineItem(sku="widget", unit_price_cents=1100)]
+    assert apply_shipping(items_over_threshold, 499, 1000) == 1100
+
+    # Test input validation for fee_cents.
+    try:
+        apply_shipping(items, -1, 1000)
+    except ValueError as exc:
+        assert "non-negative" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for negative fee_cents")
+
+    # Test input validation for free_threshold_cents.
+    try:
+        apply_shipping(items, 499, -1)
+    except ValueError as exc:
+        assert "non-negative" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for negative free_threshold_cents")
