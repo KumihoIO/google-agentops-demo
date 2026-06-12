@@ -115,6 +115,28 @@ def apply_flat_discount(items: Iterable[LineItem], discount_cents: int) -> int:
     return max(0, subtotal - discount_cents)
 
 
+def apply_shipping(items: Iterable[LineItem], fee_cents: int, free_threshold_cents: int) -> int:
+    """Return the cart subtotal plus a flat shipping fee, waiving the fee for qualifying carts.
+
+    Args:
+        items: The line items in the cart.
+        fee_cents: The shipping fee in cents.
+        free_threshold_cents: The subtotal at which shipping is free.
+
+    Returns:
+        The subtotal plus shipping in integer cents.
+    """
+    if fee_cents < 0:
+        raise ValueError("fee_cents must be non-negative")
+    if free_threshold_cents < 0:
+        raise ValueError("free_threshold_cents must be non-negative")
+
+    subtotal = subtotal_cents(items)
+    if subtotal >= free_threshold_cents:
+        return subtotal
+    return subtotal + fee_cents
+
+
 def format_money(cents: int) -> str:
     """Format cents as a US dollar amount."""
 
